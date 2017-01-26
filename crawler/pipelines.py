@@ -15,14 +15,12 @@ from crawler.items import *
 from threading import Thread
 from scrapy.conf import settings
 import logging
-# import redis
 import Queue
 import gzip
 from StringIO import StringIO
 
 socket.setdefaulttimeout(2)
 localhost = settings.get('LOCAL_IP')
-nessus = settings.get('NESSUS')
 logger = logging.getLogger('crawler.proxy.checker')
 proxy_headers = [
 	'x-proxy-id',
@@ -56,14 +54,13 @@ class PrintPipeline(object):
 class ProxyScanPipeline(object):
 
 	def __init__(self):
-		# self.redis = redis.Redis(settings.get("REDIS_IP"), settings.get("REDIS_PORT"))
 		logger.info("local ip address: %s" % localhost)
 		self.queue = Queue.Queue()
 
 	def open_spider(self, spider):
 		logger.info("spider opened.")
 		self.running = True
-		for i in xrange(100):
+		for i in xrange(50):
 			thread = Thread(target=self.scan_task, args=())
 			thread.start()
 
@@ -74,26 +71,15 @@ class ProxyScanPipeline(object):
 		self.queue.put(item)
 		return item
 
-	def push_to_nessus(self, item):
-		pass
-		# self.redis.zadd("nessus-proxy-high", "%s:%s" % (item['ip'], item['port']), item['speed'])
-		# try:
-		# 	# pass
-		# 	urllib2.urlopen("%s?ip=%s&port=%s&speed=%s&post=%s&ssl=%s" % (nessus, item['ip'], item['port'], item['speed'], item['post'], item['ssl']))
-		# except Exception, e:
-		# 	print "push error", e
-		# 	pass
-
 	def scan_task(self):
 		while self.running or not self.queue.empty():
 			try:
-				item = self.queue.get(True, 5)
-				scan(item, self.push_to_nessus)
+				item = self.queue.get(True, 1)
+				scan(item)
 			except Queue.Empty:
 				pass
 
 def scan(item, callback=None):
-	# logger.info('\033[33m[   scan]\033[m ip: \033[33m%-15s\033[m, port: \033[33m%-5s\033[m, type: \033[33m%s\033[m' % (item['ip'], item['port'], item['type']))
 	result = test_proxy(item)
 	if result is not None:
 		logger.info('\033[32m[ result]\033[m ip: \033[32m%-15s\033[m, port: \033[32m%-5s\033[m, speed: \033[32m%-4s\033[m, type: \033[32m%s\033[m' % (item['ip'], item['port'], item['speed'], item['type']))

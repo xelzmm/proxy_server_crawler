@@ -34,12 +34,11 @@ DOWNLOAD_DELAY = 1
 import urllib2
 LOCAL_IP = urllib2.urlopen('http://ifconfig.io/ip').read()[:-1]
 # PROXY = "http://61.53.143.179:80"
+
+# used by StaticProxyMiddleware, if you want to crawl through a proxy server
 PROXY = "http://localhost:8088"
-NESSUS = "http://localhost:8080/manage/add_high_proxy.json"
 
-PROXY = "http://192.168.6.202:8088"
-NESSUS = "http://192.168.6.202:8080/manage/add_high_proxy.json"
-
+# used by RandomProxyMiddleware, if you want to crawl through proxy servers
 PROXY_LIST = [
 	"http://120.83.5.164:18000",
 	"http://111.161.126.100:80",
@@ -47,5 +46,3 @@ PROXY_LIST = [
 ]
 
 RETRY_HTTP_CODES = [500, 502, 503, 504, 400, 405, 408]
-REDIS_IP = '192.168.6.35'
-REDIS_PORT = 6379

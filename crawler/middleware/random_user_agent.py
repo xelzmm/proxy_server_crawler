@@ -11,6 +11,8 @@ class RandomUserAgentMiddleware(UserAgentMiddleware):
 
     def process_request(self, request, spider):
         ua = random.choice(self.user_agent_list)
+        if request.headers.get('User-Agent') is not None:
+            return
         request.headers.setdefault('User-Agent', ua)
         self.logger.info("process request %s using random ua: %s" % (request, ua))
 

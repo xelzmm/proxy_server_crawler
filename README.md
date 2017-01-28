@@ -1,6 +1,6 @@
 ##Introduction
 
-**Proxy Server Crawler** is a tool used to crawl public proxy servers from proxy websites. When got a proxy server infomation, it can test the functionality of the server automatically.
+**Proxy Server Crawler** is a tool used to crawl public proxy servers from proxy websites. When crawled a proxy server(ip::port::type), it will test the functionality of the server automatically.
 
 Currently supported websites:
 
@@ -32,6 +32,11 @@ Currently supported testing(for http proxy)
 ```bash
 cd proxy_server_crawler
 scrapy crawl chunzhen
+```
+
+[log]
+
+```
 [ result] ip: 59.41.214.218  , port: 3128 , type: http, proxy server not alive or healthy.
 [ result] ip: 117.90.6.67    , port: 9000 , type: http, proxy server not alive or healthy.
 [ result] ip: 117.175.183.10 , port: 8123 , speed: 984 , type: high

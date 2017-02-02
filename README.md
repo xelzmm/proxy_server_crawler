@@ -13,6 +13,7 @@ Currently supported websites:
 * http://www.qiaodm.net
 * http://www.socks-proxy.net
 * http://www.xroxy.com
+* http://www.xicidaili.com
 
 Currently supported testing(for http proxy)
 

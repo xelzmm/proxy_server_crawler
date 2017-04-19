@@ -19,6 +19,10 @@ import Queue
 import gzip
 from StringIO import StringIO
 
+# adding threading
+import threading
+lock = threading.Lock()
+fs = open('proxy.txt','w') # adding here for writing http proxy
 socket.setdefaulttimeout(2)
 localhost = settings.get('LOCAL_IP')
 logger = logging.getLogger('crawler.proxy.checker')
@@ -66,6 +70,7 @@ class ProxyScanPipeline(object):
 
 	def close_spider(self, spider):
 		self.running = False
+ 		fs.close()
 
 	def process_item(self, item, spider):
 		self.queue.put(item)
@@ -82,6 +87,10 @@ class ProxyScanPipeline(object):
 def scan(item, callback=None):
 	result = test_proxy(item)
 	if result is not None:
+                # only write available http proxy
+                lock.acquire()
+                fs.write('%s://%s:%s\n' % (item['type'].lower(),item['ip'],item['port']))
+		lock.release()
 		logger.info('\033[32m[ result]\033[m ip: \033[32m%-15s\033[m, port: \033[32m%-5s\033[m, speed: \033[32m%-4s\033[m, type: \033[32m%s\033[m' % (item['ip'], item['port'], item['speed'], item['type']))
 		if item['type'] in ['high', 'anonymous'] and test_http(item) is not None and item['speed'] < 2000:
 			logger.info('\033[36m[  proxy]\033[m ip: \033[36m%-15s\033[m, port: \033[36m%-5s\033[m, speed: \033[36m%-4s\033[m, type: \033[36m%-11s\033[m, post: \033[36m%-5s\033[m, ssl: \033[36m%-5s\033[m' % (item['ip'], item['port'], item['speed'], item['type'], item['post'], item['ssl']))
@@ -130,7 +139,7 @@ def test_http(item, verbose=False):
 				if verbose:
 					log.msg(repr(content), log.DEBUG)
 			else:
-				success += 1
+				success += 1;
 				total_time += int((time.time() - begin) * 1000)
 				if verbose:
 					log.msg("%s %d" % (url, int((time.time() - begin) * 1000)), log.DEBUG)
